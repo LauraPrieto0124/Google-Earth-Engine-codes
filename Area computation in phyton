@@ -1,0 +1,20 @@
+import geopandas as gpd
+
+# Load your shapefile or GeoJSON
+districts = gpd.read_file('path_to_your_file.shp')
+
+# Ensure the CRS is in a projected coordinate system for accurate area calculation
+districts = districts.to_crs(epsg=3395)  # World Mercator projection (meters)
+
+# Calculate area (in square kilometers)
+districts['area_km2'] = districts['geometry'].area / 1e6
+
+# If population data is available, compute population density
+districts['population_density'] = districts['population'] / districts['area_km2']
+
+# Save the result to a new shapefile or CSV
+districts.to_file('districts_with_density.shp')  # Save as shapefile
+districts[['district_name', 'area_km2', 'population_density']].to_csv('population_density.csv', index=False)
+
+# Print the first rows
+print(districts.head())
